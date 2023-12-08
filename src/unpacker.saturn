@@ -1,0 +1,34 @@
+use { read_file_header } in reading;
+use { replace_file_name } in common;
+use { parse_json } in json;
+
+fn unpack_sprite_file(target) {
+  let file = io.open(target, "rb");
+  print("Reading header...");
+  let { header, image, signature } = read_file_header(file);
+  print("Unpacking header...");
+  let raw_header = {
+    file->seek("set", header.offset - 10);
+    return file->read(header.size);
+  };
+  {
+    let header_path = target->gsub("%.[^%.]+$", "." ++ header.format);
+    let fout = io.open(header_path, "w");
+    fout->write(raw_header);
+    fout->close();
+  }
+  let header_data = parse_json(raw_header);
+  print("Unpacking image " ++ header_data.meta.image ++ "...");
+  {
+    let image_path = replace_file_name(target, header_data.meta.image);
+    print(image_path);
+    let fout = io.open(image_path, "wb");
+    file->seek("set", image.offset - 10);
+    fout->write(file->read(image.size));
+    fout->close();
+  }
+  file->close();
+  print("Done");
+}
+
+return { unpack_sprite_file };

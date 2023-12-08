@@ -1,0 +1,11 @@
+type = "bin"
+
+[project]
+name = "spr-pack"
+description = "spr-pack project"
+version = "1.0.0"
+
+[build]
+format = "bin"
+
+[dependencies]

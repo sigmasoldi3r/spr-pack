@@ -1,0 +1,54 @@
+use { `->>`, write_padded, write_u32, write_u64 } in common;
+use { parse_json } in json;
+
+fn pack_sprite_file(target) {
+  let header_bytes = 0;
+  let [header, header_raw] = {
+    let file = io.open(target, "r");
+    let text = file->read("*all");
+    file->close();
+    header_bytes = #?text;
+    print("Parsing header...");
+    return [parse_json(text), text];
+  };
+
+  let image_path = {
+    if target->match("/[^/]+$") {
+      let root = target->gsub("/[^/]+$", "");
+      return root ++ "/" ++ header.meta.image;
+    }
+    return header.meta.image;
+  };
+
+  let spr_path = target->gsub("%.[^%.]+$", ".spr");
+
+  let [image, image_bytes] = {
+    let file = io.open(image_path, "rb");
+    let size = file->seek("end");
+    file->seek("set");
+    let data = file->read("*all");
+    file->close();
+    return [data, size];
+  };
+
+  let out = io.open(spr_path, "wb");
+  out->write("SPR");
+  out->>write_u64(201 + header_bytes);
+  out->>write_u64(image_bytes);
+  out->>write_padded(image_path->gsub(".-%.([^%.]+)$", "%1"), 10);
+  out->>write_u32(header.meta.size.w);
+  out->>write_u32(header.meta.size.h);
+  out->>write_padded("/* Future use, Argochamber Interactive 2023 */", 64);
+  out->>write_u64(201);
+  out->>write_u64(header_bytes);
+  out->>write_padded("json", 10);
+  out->>write_padded("/* Future use, Argochamber Interactive 2023 */", 64);
+  print("Writting " ++ header_bytes ++ " bytes for the header...");
+  out->write(header_raw);
+  print("Writting " ++ image_bytes ++ " bytes for the image...");
+  out->write(image);
+  out->close();
+  print("Done!");
+}
+
+return { pack_sprite_file };

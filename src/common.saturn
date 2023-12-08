@@ -1,0 +1,67 @@
+use { operators: { `..` } } in std;
+use { parse_json } in json;
+
+fn `->>`(l, r) = r(l);
+
+fn get_octet(i) = n => (n >> ((i - 1) * 8)) & 0xFF;
+
+fn write_u64(n) = file => {
+  let bytes = [];
+  for i in 1..8 {
+    bytes[i] = n->>get_octet(i);
+  }
+  file->write(string.char(...bytes));
+};
+
+fn write_u32(n) = file => {
+  let bytes = [];
+  for i in 1..4 {
+    bytes[i] = n->>get_octet(i);
+  }
+  file->write(string.char(...bytes));
+};
+
+fn write_padded(what, len) {
+  let pad = string.char(0)->rep(len);
+  let out = (what ++ pad)->sub(1, len);
+  return file => {
+    file->write(out);
+  };
+}
+
+fn read_u32() = file => {
+  let bytes = [file->read(4)->byte(1, -1)];
+  let out = 0;
+  for i in 1..4 {
+    out = out | (bytes[i] << ((i-1) * 8));
+  }
+  return out;
+};
+
+fn read_u64() = file => {
+  let bytes = [file->read(8)->byte(1, -1)];
+  let out = 0;
+  for i in 1..8 {
+    out = out | (bytes[i] << ((i-1) * 8));
+  }
+  return out;
+};
+
+fn replace_file_name(target, new_target) {
+  if target->match("/[^/]+$") {
+    let root = target->gsub("/[^/]+$", "");
+    return root ++ "/" ++ new_target;
+  }
+  return new_target;
+}
+
+return {
+  write_padded,
+  write_u32,
+  write_u64,
+  read_u32,
+  read_u64,
+  get_octet,
+  replace_file_name,
+  `->>`
+};

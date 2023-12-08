@@ -1,0 +1,37 @@
+use { `->>`, read_u64, read_u32 } in common;
+
+fn read_file_header(file) {
+  {
+    let sign = file->read(3);
+    if sign <> "SPR" {
+      print("Bad header:", sign);
+      panic!("Invalid .spr file, or not an Argochamber's spr file!");
+    }
+  }
+  let image_offset = file->>read_u64();
+  let image_size = file->>read_u64();
+  let image_format = file->read(10);
+  let width = file->>read_u32();
+  let height = file->>read_u32();
+  _ = file->read(64);
+  let header_offset = file->>read_u64();
+  let header_size = file->>read_u64();
+  let header_format = file->read(10);
+  return {
+    header: {
+      offset: header_offset,
+      format: header_format,
+      size: header_size
+    },
+    image: {
+      offset: image_offset,
+      format: image_format,
+      size: image_size,
+      dimensions: {
+        width, height
+      }
+    }
+  };
+}
+
+return { read_file_header };

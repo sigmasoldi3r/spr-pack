@@ -1,0 +1,16 @@
+use { read_file_header } in reading;
+
+fn test_sprite_file(target) {
+  let file = io.open(target, "rb");
+  let { header, image, signature } = read_file_header(file);
+  file->close();
+  print("Sprite data:");
+  print("  Image size: " ++ image.dimensions.width ++ " x " ++ image.dimensions.height);
+  print("  Image format: " ++ image.format);
+  print("  Header format: " ++ header.format);
+  print("  --");
+  print("  Image " ++ image.offset ++ " offset, " ++ image.size ++ " bytes size");
+  print("  Header " ++ header.offset ++ " offset, " ++ header.size ++ " bytes size");
+}
+
+return { test_sprite_file };

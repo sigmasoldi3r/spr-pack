@@ -1,0 +1,25 @@
+use { pack_sprite_file } in packer;
+use { test_sprite_file } in tester;
+use { unpack_sprite_file } in unpacker;
+
+let [ _, mode, target ] = argv;
+
+fn valid_mode(mode) = mode == "pack" or mode == "unpack" or mode == "test";
+
+if target == () or #? target <= 0 or mode == () or not valid_mode(mode) {
+  print("Usage: spr-pack <mode> <file>
+
+Where <mode> is one of:
+  pack - Packs the sprite file
+  unpack - Unpacks the sprite file
+  test - Test the sprite file");
+  os.exit(1);
+}
+
+if mode == "pack" {
+  pack_sprite_file(target);
+} else if mode == "unpack" {
+  unpack_sprite_file(target);
+} else if mode == "test" {
+  test_sprite_file(target);
+}

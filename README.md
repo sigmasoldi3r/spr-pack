@@ -8,6 +8,9 @@ a `.spr` file, following the Argochamber's SPR specification.
 Download the SPR packer for Windows or Linux, then run the executable binary,
 or alternatively you can download the repository and build it.
 
+- [Windows binaries spr-pack.exe](https://github.com/sigmasoldi3r/spr-pack/releases/download/v1.0.0/spr-pack.exe)
+- [Linux binaries spr-pack](https://github.com/sigmasoldi3r/spr-pack/releases/download/v1.0.0/spr-pack)
+
 ### Building
 
 You will need the [Saturnus toolkit](saturnus) (Saturnus compiler + Janus).
